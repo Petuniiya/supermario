@@ -97,7 +97,7 @@ var myBackground = [
 
 var myMario = new MyMario();
 var myBlocks = [new MyBlocks(800,300),new MyBlocks(1000,300),new MyBlocks(1064,300),new MyBlocks(1128,300),new MyBlocks(1192,300)];
-var myEnemy = [new MyEnemy(10,572), new MyEnemy(70,572), new MyEnemy(1000,572,2), new MyEnemy(1250,572,2)];//new MyEnemy(10,572);
+var myEnemy = new MyEnemy(1000,572,2);//[new MyEnemy(10,572), new MyEnemy(70,572), new MyEnemy(1000,572,2), new MyEnemy(1250,572,2)];
 var myPipes = [
     new MyPipes(507,586),
     new MyPipes(1281,445),
@@ -115,6 +115,7 @@ let scoreCounter = 0;
 const scoresElement = document.getElementById('scores');
 let coinCounter = 0;
 const coinsElement = document.getElementById('coin-counter');
+const gameOverElement = document.getElementById('game-over-layer');
 
 
 window.onload = ()=>{
@@ -227,7 +228,7 @@ function checkBlock(){
     }
 }
 
-function moveEnemy(enemy){
+/* function moveEnemy(enemy){
         if (enemy.cond == 4) {  return  }
         ctx.drawImage(enemy.image,enemy.frameWidth*enemy.imageFrame,enemy.frameHeight*2,enemy.frameWidth,enemy.frameHeight,enemy.x,myEnemy.y,enemy.frameWidth/2,enemy.frameHeight/2);   
         if (frameCountEnemy < 20) {
@@ -237,19 +238,19 @@ function moveEnemy(enemy){
         enemy.x += 12;
         if (myBackground[0].move)  {enemy.x -= 12;}
         enemy.imageFrame<3 ? enemy.imageFrame ++: enemy.imageFrame =0;
-}
-/* function moveEnemy(){
+} */
+ function moveEnemy(){
     if (myEnemy.cond == 4) {  return  }
     ctx.drawImage(myEnemy.image,myEnemy.frameWidth*myEnemy.imageFrame,myEnemy.frameHeight*2,myEnemy.frameWidth,myEnemy.frameHeight,myEnemy.x,myEnemy.y,myEnemy.frameWidth/2,myEnemy.frameHeight/2);   
     if (frameCountEnemy < 20) {
         return;
     }
     frameCountEnemy =0;  
-    myEnemy.x += 12;
+    myEnemy.cond ===1?myEnemy.x += 12:myEnemy.x -= 12;
     if (myBackground[0].move)  {myEnemy.x -= 12;}
     myEnemy.imageFrame<3 ? myEnemy.imageFrame ++: myEnemy.imageFrame =0;
 }
- */
+ 
 function moveEnemyArray(){
     for (let index = 0; index < myEnemy.length; index++) {
         const element = myEnemy[index];
@@ -268,7 +269,6 @@ function moveEnemyArray(){
 }
 
 function draw(){
-
     //let TO_RADIANS = Math.PI/180; 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -292,12 +292,11 @@ function draw(){
         }
     }
 
-    //frameCountEnemy++;
+    frameCountEnemy++;
     frameCountMario++;
-    myEnemy.forEach(element => {
-        frameCountEnemy++;
-        meetEnemy(element);
-    });
+  //  myEnemy.forEach(element => {
+        meetEnemy();
+ //   });
   
   //  console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
     if (myMario.x>=myBackground[0].x && myMario.x<=myBackground[0].x2+myBackground[0].x){
@@ -306,17 +305,19 @@ function draw(){
         meetPipe(myPipes2,myBackground[1].x);
     }
     
-    myEnemy.forEach(element => {
-        moveEnemy(element);  
-    });
+  //  myEnemy.forEach(element => {
+        moveEnemy();  
+  //  });
 
     moveMario();
 
-    if ( !gameStop){ window.requestAnimationFrame(draw) }
+    if ( !gameStop){ window.requestAnimationFrame(draw) } else{
+        gameOverElement.classList.add('transform')
+    }
  
 }
 
-function meetEnemy(enemy){
+/* function meetEnemy(enemy){
         if(enemy.x+40  >= myMario.x && enemy.x+40 <= myMario.x+myMario.frameWidth){
             if(myMario.y<572-enemy.frameHeight/2){
             }else if(myMario.y>=572-enemy.frameHeight/2 && myMario.y<572 ){
@@ -328,8 +329,8 @@ function meetEnemy(enemy){
             }
         } 
     
-}
-/* function meetEnemy(){
+} */
+ function meetEnemy(){
     if(myEnemy.x+40  >= myMario.x && myEnemy.x+40 <= myMario.x+myMario.frameWidth){
         if(myMario.y<572-myEnemy.frameHeight/2){
         }else if(myMario.y>=572-myEnemy.frameHeight/2 && myMario.y<572 ){
@@ -337,11 +338,11 @@ function meetEnemy(enemy){
             myEnemy.x = 0;
             increaseScores();
         }else{
-            gameStop = true;
+          //  gameStop = true;
         }
     } 
 
-} */
+} 
 function meetEnemyArray(){
     myEnemy.forEach(element => {
         if(element.x+40  >= myMario.x && element.x+40 <= myMario.x+myMario.frameWidth){
@@ -392,6 +393,10 @@ function timer(){
 
 function restartGame(){
     window.location.reload()
+}
+function startGame(){
+    const openeningBackgroundElement = document.getElementById('game-start-layer');
+    openeningBackgroundElement.classList.add('transform')
 }
 
 function increaseScores(){
