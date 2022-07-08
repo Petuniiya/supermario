@@ -1,0 +1,40 @@
+
+@font-face {
+    font-family: SuperMarioBros2;
+    src: url(SuperMarioBros2.ttf);
+}
+body{
+    font-family: 'SuperMarioBros2';
+    font-size: 36px;
+    color: white;
+    text-transform: uppercase;
+}
+.stage-flex{
+    display: flex;
+    flex-direction: column;
+    width:80%;
+    margin: auto;
+
+}
+.scores{
+    height: 15%;
+    background-image: url('../images/scores-bg.png');
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding:50px 0 0 0;
+}
+.scores-data{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#coins{flex-direction: row;}
+#coin{
+    background-image: url('../images/Coin.gif');
+    height: 50%;
+    width: 45px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
