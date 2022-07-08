@@ -21,9 +21,9 @@ class MyMario {
 }
 
 class MyEnemy {
-    constructor(){
-    this.x = 10;    
-    this.y = 572+128/2;
+    constructor(x,y){
+    this.x = x;//10;    
+    this.y = y+128/2;//572+128/2;
     this.cond = 1; //0 -stay, 1-move right, 2-move left 4- dead
     this.imageFrame = 0;
     this.frameWidth = 128;
@@ -97,7 +97,7 @@ var myBackground = [
 
 var myMario = new MyMario();
 var myBlocks = [new MyBlocks(800,300),new MyBlocks(1000,300),new MyBlocks(1064,300),new MyBlocks(1128,300),new MyBlocks(1192,300)];
-var myEnemy = new MyEnemy();
+var myEnemy = new MyEnemy(10,572);
 var myPipes = [
     new MyPipes(507,586),
     new MyPipes(1281,445),
@@ -112,10 +112,16 @@ var frameCountMario =0;
 var gameStop = false;
 
 let scoreCounter = 0;
+const scoresElement = document.getElementById('scores');
+let coinCounter = 0;
+const coinsElement = document.getElementById('coin-counter');
+
 
 window.onload = ()=>{
     draw();
     timer();
+    scoresElement.innerText = scoreCounter;
+    coinsElement.innerText = 'x'+coinCounter;
 }
 
 window.addEventListener('keydown',keydownHandlerEditor);
@@ -216,7 +222,7 @@ function checkBlock(){
                  && myBlocks[i].cond==0  && myMario.y<=myBlocks[i].y+32*2)    {
             myBlocks[i].cond=1;
             myBlocks[i].explode.play();
-            
+            increaseScores();
         }
     }
 }
@@ -267,7 +273,7 @@ function draw(){
     frameCountMario++;
 
     meetEnemy();
-    console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
+  //  console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
     if (myMario.x>=myBackground[0].x && myMario.x<=myBackground[0].x2+myBackground[0].x){
         meetPipe(myPipes,myBackground[0].x);
     }else{
@@ -283,13 +289,12 @@ function draw(){
 }
 
 function meetEnemy(){
-    const scores = document.getElementById('')
     if(myEnemy.x+40  >= myMario.x && myEnemy.x+40 <= myMario.x+myMario.frameWidth){
         if(myMario.y<572-myEnemy.frameHeight/2){
         }else if(myMario.y>=572-myEnemy.frameHeight/2 && myMario.y<572 ){
             myEnemy.cond = 4 ;
             myEnemy.x = 0;
-            scoreCounter+=1;
+            increaseScores();
         }else{
             gameStop = true;
         }
@@ -326,4 +331,13 @@ function timer(){
       timer.innerText = counter;
       counter += 1;
     }, 1000);
+}
+
+function restartGame(){
+    window.location.reload()
+}
+
+function increaseScores(){
+    scoreCounter+=1;
+    scoresElement.innerText = scoreCounter;
 }

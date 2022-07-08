@@ -14,6 +14,7 @@ body{
     flex-direction: column;
     width:80%;
     margin: auto;
+    position: relative;
 
 }
 .scores{
@@ -37,4 +38,13 @@ body{
     width: 45px;
     background-repeat: no-repeat;
     background-position: center;
+}
+.restart-button{
+    font-size: 8px;
+    cursor: pointer;
+}
+.restart-button-wrap{
+    position: absolute;
+    top:20px;
+    right:20px;
 }
