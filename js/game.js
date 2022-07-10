@@ -21,10 +21,10 @@ class MyMario {
 }
 
 class MyEnemy {
-    constructor(){
-    this.x = 10;    
-    this.y = 572+128/2;
-    this.cond = 1; //0 -stay, 1-move right, 2-move left 4- dead
+    constructor(x,y, condition = 1){
+    this.x = x;//10;    
+    this.y = y+128/2;//572+128/2;
+    this.cond = condition; //0 -stay, 1-move right, 2-move left 4- dead
     this.imageFrame = 0;
     this.frameWidth = 128;
     this.frameHeight = 128;
@@ -97,7 +97,7 @@ var myBackground = [
 
 var myMario = new MyMario();
 var myBlocks = [new MyBlocks(800,300),new MyBlocks(1000,300),new MyBlocks(1064,300),new MyBlocks(1128,300),new MyBlocks(1192,300)];
-var myEnemy = new MyEnemy();
+var myEnemy = new MyEnemy(1000,572,2);//[new MyEnemy(10,572), new MyEnemy(70,572), new MyEnemy(1000,572,2), new MyEnemy(1250,572,2)];
 var myPipes = [
     new MyPipes(507,586),
     new MyPipes(1281,445),
@@ -112,10 +112,17 @@ var frameCountMario =0;
 var gameStop = false;
 
 let scoreCounter = 0;
+const scoresElement = document.getElementById('scores');
+let coinCounter = 0;
+const coinsElement = document.getElementById('coin-counter');
+const gameOverElement = document.getElementById('game-over-layer');
+
 
 window.onload = ()=>{
     draw();
     timer();
+    scoresElement.innerText = scoreCounter;
+    coinsElement.innerText = 'x'+coinCounter;
 }
 
 window.addEventListener('keydown',keydownHandlerEditor);
@@ -216,30 +223,52 @@ function checkBlock(){
                  && myBlocks[i].cond==0  && myMario.y<=myBlocks[i].y+32*2)    {
             myBlocks[i].cond=1;
             myBlocks[i].explode.play();
-            
+            increaseScores();
         }
     }
 }
 
-function moveEnemy(){
-
+/* function moveEnemy(enemy){
+        if (enemy.cond == 4) {  return  }
+        ctx.drawImage(enemy.image,enemy.frameWidth*enemy.imageFrame,enemy.frameHeight*2,enemy.frameWidth,enemy.frameHeight,enemy.x,myEnemy.y,enemy.frameWidth/2,enemy.frameHeight/2);   
+        if (frameCountEnemy < 20) {
+            return;
+        }
+        frameCountEnemy =0;  
+        enemy.x += 12;
+        if (myBackground[0].move)  {enemy.x -= 12;}
+        enemy.imageFrame<3 ? enemy.imageFrame ++: enemy.imageFrame =0;
+} */
+ function moveEnemy(){
     if (myEnemy.cond == 4) {  return  }
-
     ctx.drawImage(myEnemy.image,myEnemy.frameWidth*myEnemy.imageFrame,myEnemy.frameHeight*2,myEnemy.frameWidth,myEnemy.frameHeight,myEnemy.x,myEnemy.y,myEnemy.frameWidth/2,myEnemy.frameHeight/2);   
-
     if (frameCountEnemy < 20) {
         return;
     }
-
     frameCountEnemy =0;  
-    myEnemy.x += 12;
+    myEnemy.cond ===1?myEnemy.x += 12:myEnemy.x -= 12;
     if (myBackground[0].move)  {myEnemy.x -= 12;}
     myEnemy.imageFrame<3 ? myEnemy.imageFrame ++: myEnemy.imageFrame =0;
+}
+ 
+function moveEnemyArray(){
+    for (let index = 0; index < myEnemy.length; index++) {
+        const element = myEnemy[index];
+        if (element.cond == 4) {  return  }
+        ctx.drawImage(element.image,element.frameWidth*element.imageFrame,element.frameHeight*index,element.frameWidth,element.frameHeight,element.x,element.y,element.frameWidth/2,element.frameHeight/2);   
+        if (frameCountEnemy < 20) {
+            return;
+        }
+        frameCountEnemy =0;  
+        element.x += 12;
+        if (myBackground[0].move)  {element.x -= 12;}
+        element.imageFrame<3 ? element.imageFrame ++: element.imageFrame =0;
+    }
+    
   
 }
 
 function draw(){
-
     //let TO_RADIANS = Math.PI/180; 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -265,35 +294,69 @@ function draw(){
 
     frameCountEnemy++;
     frameCountMario++;
-
-    meetEnemy();
-    console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
+  //  myEnemy.forEach(element => {
+        meetEnemy();
+ //   });
+  
+  //  console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
     if (myMario.x>=myBackground[0].x && myMario.x<=myBackground[0].x2+myBackground[0].x){
         meetPipe(myPipes,myBackground[0].x);
     }else{
         meetPipe(myPipes2,myBackground[1].x);
     }
     
-    
-    moveEnemy();
+  //  myEnemy.forEach(element => {
+        moveEnemy();  
+  //  });
+
     moveMario();
 
-    if ( !gameStop){ window.requestAnimationFrame(draw) }
+    if ( !gameStop){ window.requestAnimationFrame(draw) } else{
+        gameOverElement.classList.add('transform')
+    }
  
 }
 
-function meetEnemy(){
-    const scores = document.getElementById('')
+/* function meetEnemy(enemy){
+        if(enemy.x+40  >= myMario.x && enemy.x+40 <= myMario.x+myMario.frameWidth){
+            if(myMario.y<572-enemy.frameHeight/2){
+            }else if(myMario.y>=572-enemy.frameHeight/2 && myMario.y<572 ){
+                enemy.cond = 4 ;
+                enemy.x = 0;
+                increaseScores();
+            }else{
+                gameStop = true;
+            }
+        } 
+    
+} */
+ function meetEnemy(){
     if(myEnemy.x+40  >= myMario.x && myEnemy.x+40 <= myMario.x+myMario.frameWidth){
         if(myMario.y<572-myEnemy.frameHeight/2){
         }else if(myMario.y>=572-myEnemy.frameHeight/2 && myMario.y<572 ){
             myEnemy.cond = 4 ;
             myEnemy.x = 0;
-            scoreCounter+=1;
+            increaseScores();
         }else{
-            gameStop = true;
+          //  gameStop = true;
         }
-    }
+    } 
+
+} 
+function meetEnemyArray(){
+    myEnemy.forEach(element => {
+        if(element.x+40  >= myMario.x && element.x+40 <= myMario.x+myMario.frameWidth){
+            if(myMario.y<572-element.frameHeight/2){
+            }else if(myMario.y>=572-element.frameHeight/2 && myMario.y<572 ){
+                element.cond = 4 ;
+                element.x = 0;
+                increaseScores();
+            }else{
+                gameStop = true;
+            }
+        } 
+    });
+    
 }
 
 function meetPipe(CurPipes,xc){
@@ -326,4 +389,17 @@ function timer(){
       timer.innerText = counter;
       counter += 1;
     }, 1000);
+}
+
+function restartGame(){
+    window.location.reload()
+}
+function startGame(){
+    const openeningBackgroundElement = document.getElementById('game-start-layer');
+    openeningBackgroundElement.classList.add('transform')
+}
+
+function increaseScores(){
+    scoreCounter+=1;
+    scoresElement.innerText = scoreCounter;
 }
