@@ -21,16 +21,18 @@ class MyMario {
 }
 
 class MyEnemy {
-    constructor(x,y, condition = 1){
+    constructor(x,y, condition = 0){
     this.x = x;//10;    
     this.y = y+128/2;//572+128/2;
-    this.cond = condition; //0 -stay, 1-move right, 2-move left 4- dead
-    this.imageFrame = 0;
+    this.cond = condition; //0 -move right, 1-move left 4- dead
+    this.type = 2;
+    this.speed = 10;
+    this.imageFrame = condition*4;
     this.frameWidth = 128;
     this.frameHeight = 128;
 
     this.image = new Image();
-    this.image.src ='./images/enemy.png';
+    this.image.src ='./images/enemy2.png';
     
     }
 }
@@ -97,7 +99,7 @@ var myBackground = [
 
 var myMario = new MyMario();
 var myBlocks = [new MyBlocks(800,300),new MyBlocks(1000,300),new MyBlocks(1064,300),new MyBlocks(1128,300),new MyBlocks(1192,300)];
-var myEnemy = new MyEnemy(1000,572,2);//[new MyEnemy(10,572), new MyEnemy(70,572), new MyEnemy(1000,572,2), new MyEnemy(1250,572,2)];
+var myEnemies = [new MyEnemy(1000,572,0)];//[new MyEnemy(10,572), new MyEnemy(70,572), new MyEnemy(1000,572,2), new MyEnemy(1250,572,2)];
 var myPipes = [
     new MyPipes(507,586),
     new MyPipes(1281,445),
@@ -201,7 +203,8 @@ function jumpMario(){
             return;
         }else{
            
-            curTimer>=500 ? myMario.y = Math.min(myMario.y+12,myMario.floor) : myMario.y = Math.max(myMario.y-12,200); 
+            console.log(curTimer,myMario.floor-curTimer*300/500);
+            curTimer>=500 ? myMario.y = Math.min(myMario.y+12,myMario.floor) : myMario.y =myMario.floor-curTimer*300/500;// Math.max(myMario.y-12,200); 
 
             myMario.cond == 1 ? myMario.x +=1 : myMario.cond == 2 ? myMario.x -=1 : myMario.x;
    
@@ -228,45 +231,27 @@ function checkBlock(){
     }
 }
 
-/* function moveEnemy(enemy){
-        if (enemy.cond == 4) {  return  }
-        ctx.drawImage(enemy.image,enemy.frameWidth*enemy.imageFrame,enemy.frameHeight*2,enemy.frameWidth,enemy.frameHeight,enemy.x,myEnemy.y,enemy.frameWidth/2,enemy.frameHeight/2);   
-        if (frameCountEnemy < 20) {
-            return;
-        }
-        frameCountEnemy =0;  
-        enemy.x += 12;
-        if (myBackground[0].move)  {enemy.x -= 12;}
-        enemy.imageFrame<3 ? enemy.imageFrame ++: enemy.imageFrame =0;
-} */
+
  function moveEnemy(){
-    if (myEnemy.cond == 4) {  return  }
-    ctx.drawImage(myEnemy.image,myEnemy.frameWidth*myEnemy.imageFrame,myEnemy.frameHeight*2,myEnemy.frameWidth,myEnemy.frameHeight,myEnemy.x,myEnemy.y,myEnemy.frameWidth/2,myEnemy.frameHeight/2);   
-    if (frameCountEnemy < 20) {
-        return;
+
+    for (let enemy of myEnemies){
+        if (enemy.cond == 4) {  continue  }
+
+       // enemy.update(enemy.x,enemy.y,enemy.frameWidth,enemy.frameHeight);
+        ctx.drawImage(enemy.image,enemy.frameWidth*enemy.imageFrame,enemy.frameHeight*enemy.type,enemy.frameWidth,enemy.frameHeight,enemy.x,enemy.y,enemy.frameWidth/2,enemy.frameHeight/2);   
+       
+        if (frameCountEnemy == 20) {
+            enemy.x -= enemy.speed;    
+
+            if (myBackground[0].move)  {enemy.x -= 12;}
+            enemy.imageFrame<3+enemy.cond*4 ? enemy.imageFrame ++: enemy.imageFrame =enemy.cond*4;
+        }
     }
-    frameCountEnemy =0;  
-    myEnemy.cond ===1?myEnemy.x += 12:myEnemy.x -= 12;
-    if (myBackground[0].move)  {myEnemy.x -= 12;}
-    myEnemy.imageFrame<3 ? myEnemy.imageFrame ++: myEnemy.imageFrame =0;
+
+    if (frameCountEnemy == 20) {frameCountEnemy =0}
 }
  
-function moveEnemyArray(){
-    for (let index = 0; index < myEnemy.length; index++) {
-        const element = myEnemy[index];
-        if (element.cond == 4) {  return  }
-        ctx.drawImage(element.image,element.frameWidth*element.imageFrame,element.frameHeight*index,element.frameWidth,element.frameHeight,element.x,element.y,element.frameWidth/2,element.frameHeight/2);   
-        if (frameCountEnemy < 20) {
-            return;
-        }
-        frameCountEnemy =0;  
-        element.x += 12;
-        if (myBackground[0].move)  {element.x -= 12;}
-        element.imageFrame<3 ? element.imageFrame ++: element.imageFrame =0;
-    }
-    
-  
-}
+
 
 function draw(){
     //let TO_RADIANS = Math.PI/180; 
@@ -294,9 +279,8 @@ function draw(){
 
     frameCountEnemy++;
     frameCountMario++;
-  //  myEnemy.forEach(element => {
-        meetEnemy();
- //   });
+ 
+    meetEnemy(myEnemies[0]);
   
   //  console.log(myMario.x,myBackground[0].x,myBackground[0].x2+myBackground[0].x);
     if (myMario.x>=myBackground[0].x && myMario.x<=myBackground[0].x2+myBackground[0].x){
@@ -305,10 +289,7 @@ function draw(){
         meetPipe(myPipes2,myBackground[1].x);
     }
     
-  //  myEnemy.forEach(element => {
-        moveEnemy();  
-  //  });
-
+    moveEnemy();  
     moveMario();
 
     if ( !gameStop){ window.requestAnimationFrame(draw) } else{
@@ -317,47 +298,29 @@ function draw(){
  
 }
 
-/* function meetEnemy(enemy){
-        if(enemy.x+40  >= myMario.x && enemy.x+40 <= myMario.x+myMario.frameWidth){
-            if(myMario.y<572-enemy.frameHeight/2){
-            }else if(myMario.y>=572-enemy.frameHeight/2 && myMario.y<572 ){
-                enemy.cond = 4 ;
-                enemy.x = 0;
-                increaseScores();
-            }else{
-                gameStop = true;
-            }
-        } 
+function meetEnemy(myEnemy){
+
     
-} */
- function meetEnemy(){
-    if(myEnemy.x+40  >= myMario.x && myEnemy.x+40 <= myMario.x+myMario.frameWidth){
+    /* if(myMario.y>myEnemy.y+myEnemy.frameHeight/2 || myMario.y+myMario.frameHeight < myEnemy.y
+        || myMario.x+myMario.frameWidth > myEnemy.x || myMario.x > myEnemy.x+myEnemy.frameWidth/2)  */
+
+    if((myMario.x>=myEnemy.x && myMario.x<=myEnemy.x+myEnemy.frameWidth/2) ||
+        (myMario.x+myMario.frameWidth>=myEnemy.x && myMario.x+myMario.frameWidth<=myEnemy.x+myEnemy.frameWidth/2)){
+
+            console.log(myMario.x,myMario.y,myMario.x+myMario.frameWidth,myMario.y+myMario.frameHeight);
+            console.log(myEnemy.x,myEnemy.y,myEnemy.x+myEnemy.frameWidth/2,myEnemy.y+myEnemy.frameHeight/2);
+    
         if(myMario.y<572-myEnemy.frameHeight/2){
         }else if(myMario.y>=572-myEnemy.frameHeight/2 && myMario.y<572 ){
             myEnemy.cond = 4 ;
-            myEnemy.x = 0;
+            myEnemy.x = -1000;
             increaseScores();
         }else{
-          //  gameStop = true;
+            gameStop = true;
         }
     } 
 
 } 
-function meetEnemyArray(){
-    myEnemy.forEach(element => {
-        if(element.x+40  >= myMario.x && element.x+40 <= myMario.x+myMario.frameWidth){
-            if(myMario.y<572-element.frameHeight/2){
-            }else if(myMario.y>=572-element.frameHeight/2 && myMario.y<572 ){
-                element.cond = 4 ;
-                element.x = 0;
-                increaseScores();
-            }else{
-                gameStop = true;
-            }
-        } 
-    });
-    
-}
 
 function meetPipe(CurPipes,xc){
 
@@ -390,7 +353,6 @@ function timer(){
       counter += 1;
     }, 1000);
 }
-
 function restartGame(){
     window.location.reload()
 }
@@ -398,7 +360,6 @@ function startGame(){
     const openeningBackgroundElement = document.getElementById('game-start-layer');
     openeningBackgroundElement.classList.add('transform')
 }
-
 function increaseScores(){
     scoreCounter+=1;
     scoresElement.innerText = scoreCounter;
