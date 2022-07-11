@@ -167,6 +167,7 @@ function keydownHandlerEditor(event)
         case 37: //left
             myMario.cond = 2; 
             myMario.x -= 3;    
+            if (myBackground[0].move)  {myMario.x -=3 ;}
             if (!myMario.inJump)  {myMario.y = myMario.floor;}
             break;
         
@@ -257,9 +258,9 @@ function checkBlock(){
         if (frameCountEnemy == 20) {
             enemy.x -= enemy.speed;    
             enemy.imageFrame<3+enemy.cond*4 ? enemy.imageFrame ++: enemy.imageFrame =enemy.cond*4;
-            if (myBackground[0].move)  {enemy.x -= enemy.speed+19;}
+            
         }
-        
+        if (myBackground[0].move)  {enemy.x -= 1;}
     }
 
     if (frameCountEnemy == 20) {frameCountEnemy =0}
